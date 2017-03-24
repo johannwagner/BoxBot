@@ -8,8 +8,9 @@ def get_rate_limit():
                            params={"client_id": Security.CLIENT_ID,
                                    "client_secret": Security.CLIENT_SECRET}).json()
     rate = request.get("rate")
-    return "Requests {actual}/{all}".format(actual=rate.get('remaining'), all=rate.get('limit'))
 
+    return {'actual': rate.get('remaining'),
+            'all': rate.get('limit')}
 
 def get_milestone_stats():
     request = requests.get("https://api.github.com/repos/hovgaardgames/startupcompany/milestones",
