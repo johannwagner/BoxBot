@@ -10,7 +10,7 @@ import ChatHelper
 import Security
 from AsyncTask import AsyncTask
 from Commands.CommandData import Command
-from Commands.CommandHelper import say_toast, test, id_func, rate_limit, milestone, unsubscribe, subscribe
+from Commands.CommandHelper import say_toast, test, id_func, rate_limit, milestone, unsubscribe, subscribe, server
 from Session import Session
 
 import logging
