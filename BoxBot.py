@@ -10,7 +10,7 @@ import ChatHelper
 import Security
 from AsyncTask import AsyncTask
 from Commands.CommandData import Command
-from Commands.CommandHelper import say_toast, test, id_func, rate_limit, milestone
+from Commands.CommandHelper import say_toast, test, id_func, rate_limit, milestone, unsubscribe, subscribe
 from Session import Session
 
 import logging
@@ -106,6 +106,9 @@ commands.append(Command(command="!test", restricted=True, assigned_function=test
 commands.append(Command(command="!id", restricted=False, assigned_function=id_func))
 commands.append(Command(command="!ratelimit", restricted=True, assigned_function=rate_limit))
 commands.append(Command(command="!milestone", restricted=False, assigned_function=milestone))
+commands.append(Command(command="!subscribe", restricted=False, assigned_function=subscribe))
+commands.append(Command(command="!unsubscribe", restricted=False, assigned_function=unsubscribe))
+commands.append(Command(command="!server", restricted=False, assigned_function=server))
 
 client.loop.create_task(pull_github())
 client.run(Security.DISCORD_TOKEN)

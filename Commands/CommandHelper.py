@@ -1,6 +1,7 @@
 import discord
 
 import Requester
+import Security
 import Session
 
 
@@ -34,6 +35,9 @@ async def milestone(session: Session, message: discord.Message):
                                                   percent=round(milestone['percentage'], 2)))
 
 
+async def server(session: Session, message: discord.Message):
+    await session.client.send_message(message.channel, "**Server:** {pos}"
+                                      .format(pos = "Server" if Security.SERVER is None or Security.SERVER else "Local"))
 async def id_func(session: Session, message: discord.Message):
     await session.client.send_message(message.author, "** Your User ID is:** `{id}`".format(id=message.author.id))
 
