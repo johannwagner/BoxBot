@@ -21,10 +21,9 @@ class UserManager:
         allowed_members = self.session.user_manager_data.get('allowed_members')
 
         channel_permission = member.permissions_in(channel)
-        if channel_permission.administrator or member.id in allowed_members:
+        if channel_permission.administrator or (member.id in allowed_members):
             return True
         else:
-            await self.client.send_message(channel, "**You are not allowed to this!**")
             return False
 
     def add_allowed_user(self, id: int):

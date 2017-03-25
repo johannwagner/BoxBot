@@ -27,5 +27,7 @@ class Command:
         if (not self.restricted) or (self.restricted and user_allow):
             session.logger.info("User {user} issued {command}.".format(user = message.author.name, command = self.command))
             await self.assigned_function(session, message)
-
+        else:
+            session.logger.info("User {user} issued {command} and was not allowed.".format(user = message.author.name, command = self.command))
+            await self.client.send_message(message.channel, "**You are not allowed to this!**")
 
