@@ -12,6 +12,16 @@ def get_rate_limit():
     return {'actual': rate.get('remaining'),
             'all': rate.get('limit')}
 
+def get_comment_stats():
+    request = requests.get("https://api.github.com/repos/hovgaardgames/startupcompany/issues/comments",
+                           params={"client_id": Security.CLIENT_ID,
+                                   "client_secret": Security.CLIENT_SECRET,
+                                   "per_page": 100,
+                                   "sort": "created",
+                                   "direction": "desc"
+                                   }).json()
+    return request
+
 def get_milestone_stats():
     request = requests.get("https://api.github.com/repos/hovgaardgames/startupcompany/milestones",
                            params={"client_id": Security.CLIENT_ID,

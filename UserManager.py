@@ -1,6 +1,6 @@
 import discord
 
-import ChatHelper
+import ChatManager
 import Session
 
 
