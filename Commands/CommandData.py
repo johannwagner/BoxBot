@@ -19,7 +19,7 @@ class Command:
     async def process_command(self, session: Session, message: discord.Message):
 
         user_manager = session.user_manager
-        if not message.content.startswith(self.command):
+        if not message.content.startswith(self.command) or message.author == session.client.user:
             return
 
         user_allow = await user_manager.is_user_allowed(channel=message.channel, member=message.author)
@@ -29,5 +29,5 @@ class Command:
             await self.assigned_function(session, message)
         else:
             session.logger.info("User {user} issued {command} and was not allowed.".format(user = message.author.name, command = self.command))
-            await self.client.send_message(message.channel, "**You are not allowed to this!**")
+            await session.client.send_message(message.channel, "**You are not allowed to this!**")
 

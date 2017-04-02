@@ -3,6 +3,7 @@ import datetime
 
 import dateutil.parser
 import discord
+import pytz
 import requests
 
 import Requester
@@ -17,12 +18,8 @@ async def loop_issues(session: Session, message: discord.Message):
     await asyncio.sleep(5)
 
     while not client.is_closed:
-        request = requests.get("https://api.github.com/repos/hovgaardgames/startupcompany/issues",
-                               params={"state": "all",
-                                       "client_id": "6155522b016d8c49ce3a",
-                                       "client_secret": "75d08f6977075855c730a406e93c96774a386769",
-                                       "per_page": 100})
-        json = request.json()
+
+        json = Requester.get_issue_stats()
 
         for issue in json:
             closed = issue.get('closed_at')
@@ -31,9 +28,9 @@ async def loop_issues(session: Session, message: discord.Message):
                     session.logger.info("Added {id} to open_issue.".format(id=issue.get('id')))
                     session.open_issues.append(issue.get('id'))
                     await session.chat_manager.send_message(
-                        " :question: **{user} created Issue #{number}:**  `{title}` \n GitHub: {html_url}"
+                        " :question: **{user} created Issue #{number}:**  `{title}` \n GitHub: <{html_url}>"
                             .format(user=issue.get('user').get('login'), number=issue.get('number'),
-                                    title=issue.get('title'), html_url=issue.get('html_url')), 'issues')
+                                    title=issue.get('title'), html_url=issue.get('html_url')), 'issues_created')
 
             else:
                 closed_time = dateutil.parser.parse(closed)
@@ -42,8 +39,9 @@ async def loop_issues(session: Session, message: discord.Message):
                     session.logger.info("Added {id} to closed_issue.".format(id=issue.get('id')))
                     session.closed_issues.append(issue.get('id'))
                     await session.chat_manager.send_message(
-                        " :white_check_mark: **Issue #{number} closed:**  `{title}` "
-                            .format(number=issue.get('number'), title=issue.get('title')), 'issues')
+                        " :white_check_mark: **Issue #{number} closed:**  `{title}` \n GitHub: <{html_url}>"
+                            .format(number=issue.get('number'), title=issue.get('title'),
+                                    html_url=issue.get('html_url')), 'issues_closed')
 
         session.last_request_time = datetime.datetime.now(datetime.timezone.utc)
         await asyncio.sleep(60)
@@ -65,9 +63,10 @@ async def loop_comments(session: Session, message: discord.Message):
                 user = comment.get('user')
                 url = str(comment.get('html_url'))
                 issue = url[url.rfind('/') + 1:url.rfind('#')]
-                await session.chat_manager.send_message(':bell: **{user} commented on Issue #{issue}.** \n GitHub: {html_url}'
-                                                  .format(user=user.get('login'), issue=issue,
-                                                          html_url=comment.get('html_url')), 'comments')
+                await session.chat_manager.send_message(
+                    ':bell: **{user} commented on Issue #{issue}.** \n GitHub: <{html_url}>'
+                        .format(user=user.get('login'), issue=issue,
+                                html_url=comment.get('html_url')), 'comments')
 
         await asyncio.sleep(60)
 
@@ -132,3 +131,27 @@ async def test(session: Session, message: discord.Message):
         session.open_issues.remove(216597554)
     if 289068683 in session.comments:
         session.comments.remove(289068683)
+
+
+async def newissues(session: Session, message: discord.Message):
+    issues = Requester.get_issue_stats()
+    nissues = filter(
+        lambda x: dateutil.parser.parse(x.get('created_at')) > datetime.datetime.now(pytz.utc) - datetime.timedelta(
+            days=1),
+        issues)
+
+    messages = ['**Created Issues in last 24 h:**']
+    messages.extend(["**Issue #{number}:** `{title}` \n GitHub: <{html_url}>".format(number=issue.get('number'), title=issue.get('title'), html_url=issue.get('html_url')) for
+                issue in nissues])
+
+    mstring = '\n'.join(messages)
+    await session.client.send_message(message.channel, mstring)
+
+async def helpdisplay(session: Session, message: discord.Message):
+    messages = ["**Commands:**"]
+    messages.append('**!id** - Shows your personal user id.')
+    messages.append('**!milestone** - Shows progress of actual milestone(s).')
+    messages.append('**!newissues** - Shows recently created issues.')
+
+    text = '\n'.join(messages)
+    await session.client.send_message(message.channel, text)

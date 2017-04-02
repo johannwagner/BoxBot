@@ -6,7 +6,7 @@ import Security
 from AsyncTask import AsyncTask
 from Commands.CommandData import Command
 from Commands.CommandHelper import say_toast, test, id_func, rate_limit, milestone, unsubscribe, subscribe, server, \
-    loop_issues, loop_comments
+    loop_issues, loop_comments, newissues, helpdisplay
 from Session import Session
 
 logger = logging.getLogger('BoxBot')
@@ -66,6 +66,8 @@ commands.append(Command(command="!milestone", restricted=False, assigned_functio
 commands.append(Command(command="!subscribe", restricted=True, assigned_function=subscribe))
 commands.append(Command(command="!unsubscribe", restricted=True, assigned_function=unsubscribe))
 commands.append(Command(command="!server", restricted=True, assigned_function=server))
+commands.append(Command(command="!newissues", restricted=False, assigned_function=newissues))
+commands.append(Command(command="!help", restricted=False, assigned_function=helpdisplay))
 
 client.loop.create_task(loop_issues(session, None))
 client.loop.create_task(loop_comments(session, None))
